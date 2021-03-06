@@ -1,0 +1,97 @@
+Instructions for "registerToSTORM.m" (written for MATLAB 2015, should work for all versions)
+
+Line 4 : sample = 'C7' - Amine has his images and folders named uniformly like:
+ "/Users/reyer/Documents/MATLAB/SOURCE_CODES/sample_images_matt/Matt_Microscope/2021_March2nd_SC35_M3/',sample,'/',sample,'_M3_F6_488.tif"
+ where sample is automatically replaced by C7 in the following filepaths
+ 
+You don't have to have uniform names like that. If you don't, just replace everything in the filepath variables with the full filepath of your images
+If you do this, you don't need to change "sample", it won't change anything
+
+Line 5: saveFile - filepath to where images are automatically saved. If you don't want to save the images, no need to change this, it doesn't matter
+
+Line 7: repositionFigures = 1  - Change to 1 if you want the figures to automatically organize around the screen (though this was calibrated to my computer)
+								- Change to 0 for standard output, i.e. figures will lay on top of each other
+								
+Line 8: saveFigures = 0   - Change to 1 if you want to automatically save figures to "saveFile" location (this takes a while, so probably change it to 0)								
+							- Change to 0 if you don't want figures saved automatically
+							
+							
+Line 10: gfp_path = Change this to the filepath to the 488 channel image of the sptPALM signal. You can change the entire variable after the = to:
+
+					gfp_path = 'example/path/to/sptPALM_488.tif';
+					
+					This is the "fixed image", i.e. the one whose coordinates will not be transformed. STORM spots are mapped on to sptPALM spots
+
+Line 11: gfp_post_path = Change this to the filepath to the epi image of the STORM signal. You can change the entire variable after the = to:
+
+					gfp_post_path = 'example/path/to/STORM_EPI.tif';
+					
+					This is the "moving image", i.e. the one whose coordinates will be transformed			
+					
+Line 13-14 : these are remnants from past code. You can ignore them. Just leave them unchanged		
+
+Line 16: storm_file - This is the filepath to the STORM spot coordinates, in the form of a .csv. You can change the entire variable after the = to:
+					
+					storm_file = 'example/path/to/STORM_coordinates.csv'; 		
+					
+Line 17: msd_file - This is the filepath to the sptPALM spot coordinates and diffusion coefficients, in the form of a .txt or .dat. 
+You can change the entire variable after the = to:
+					
+					msd_file = 'example/path/to/sptPALM_data.dat';					
+												
+												
+												
+If the STORM and PALM data are in the same format as the ones Amine provided, these are the last things you have to change.
+For the rest, you can just run the code
+
+The only other thing you will have to do manually is align the sptPALM spots on top of the 488 image. You will see a pop-up window.
+
+First window is up/down motion: - is move spots down, + is up (488 image will not move) (you can also leave blank for 0)
+
+Second window is left/right motion: - is move spots right, + is left (488 image will not move) (you can also leave blank for 0)
+
+Third window is if you want to continue translation or not: 0 means you are done, 1 means continue (DO NOT LEAVE BLANK. INPUT EITHER 0 OR 1)
+
+If you are done translating the spots, you can either input 0 into the first two windows, or just leave them blank. Then, put 0 in the third window
+Click "ok" for all steps. Do not click "cancel", or script will start over
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+Further explanation
+
+Line 19-46 : setting up image parameters. Don't change these
+
+Line 48-51 : image processing. Don't change
+
+Line 53-57: image registration. Don't change
+
+Line 59-68: Speckle detection and image alignment
+
+Line 78-89: Organizing data from STORM and PALM .csv's and .dat's	
+
+Line 91-111: sptPALM spot alignment
+
+Line 113-216: making figures of spots
+
+Line 219-246: placing STORM spots, sptPALM spots, and sptPALM diffusion coefficients into matrices (same size as input images)											
+												
+Line 248-259: Filling out those matrices
+
+Line 261-336: Calculating pixel-by-pixel correlation and making correlation figures
+
+Line 339-409: Plotting STORM spots (registered and original), sptPALM spots, and sptPALM diffusion coefficients
+
+Line 411-422: Determining diffusion coefficients in and outside of nuclear speckles (in binary image)
+
+Line 425-467: comparing diffusion coefficients in and outside of nuclear speckles, and makes the barchart
+
+												
+												
+												
+												
+												
+												
+												
+												
