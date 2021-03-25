@@ -24,8 +24,7 @@ Line 9: low_pass_register = 0 - Change to 1 if you want to register the differen
 						 		I typically use, but for the pol2 images, this doesn't seem to work well
 						 	  - Change to 0 if you want to register the channels based on original images. Apparently works better for pol2
 						 	  
-Line 11: cluster_size = 5 - size of the region to draw around each STORM cluster for PALM diffusion correlation
-							example: cluster_size = 5 draws a 5x5 box around each cluster, with the cluster itself being the center pixel
+
 							
 Line 12: Npts = x - change to whatever DBSCAN parameter you are using/analyzing
 
@@ -59,11 +58,21 @@ Line 27: storm_pix_size  = 173 - change to the pixel size of your STORM images, 
 
 Line 28: msd_pix_size = .130 - change to the pixel size of your PALM images, apparently in um
 
-Line 38: cluster_file = sprintf(...,output,...) -  the name of the file containing cluster coordinates
+Line 39: cluster_file = sprintf(...,output,...) -  the name of the file containing cluster coordinates
 						- the variable "output" comes from the script "preRegistration_clusterScript.m"
 						
 						NOTE - I wrote these scripts to automatically save and store filenames based on a MAC operating system. Naming conventions of 
-								PCs differ, and may need to change								
+								PCs differ, and may need to change		
+								
+Line 43: storm_x_col = 2; % Column for x coordinates in STORM csv
+Line 44: storm_y_col = 3; % Column for y coordinates in STORM csv
+
+Line 46: cluster_x_col = 1; % Column for x coordinates in total_centers
+Line 47: cluster_y_col = 2; % Column for y coordinates in total_centers
+Line 48: cluster_radius_col = 4; % Column for cluster radius in total_centers
+
+Line 50: msd_x_col = 1; % Column for x coordinates in MSD .dat
+Line 51: msd_y_col = 2; % Column for x coordinates in MSD .dat														
 												
 												
 												

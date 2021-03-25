@@ -8,7 +8,7 @@ repositionFigures = 1; % 1 to reposition/resize figures according to my laptop, 
 saveFigures = 1; % 1 to save figures to "saveFile" location, 0 to not save (automatically)
 low_pass_register = 0; % 1 to register the low pass images, 0 to register original images
 
-cluster_size = 5;
+
 Npts = 2;
 Eps = 15;
 
@@ -39,6 +39,16 @@ high_pass_thresh = 0.075;
 cluster_file = sprintf('%s_Cluster_Centers_ColorCode%d_%d_%d.dat',output,ColorCode,Npts,Eps);
 
 total_centers = TotalCenters_master(cluster_file,Start_Npts,End_Npts,Increment_Npts,Start_Eps,End_Eps,Increment_Eps);
+
+storm_x_col = 2; % Column for x coordinates in STORM csv
+storm_y_col = 3; % Column for y coordinates in STORM csv
+
+cluster_x_col = 1; % Column for x coordinates in total_centers
+cluster_y_col = 2; % Column for y coordinates in total_centers
+cluster_radius_col = 4; % Column for cluster radius in total_centers
+
+msd_x_col = 1; % Column for x coordinates in MSD .dat
+msd_y_col = 2; % Column for x coordinates in MSD .dat
 
 % Path to main file (i.e. channel) that you will use for segmentation
 %filepath_dic = strcat(['/Users/reyer/Documents/MATLAB/SOURCE_CODES/sample_images_matt/Matt_Microscope/August_24_17_convert/+SgrS/t20/dic',num2str(cell_num),'.tif']);
@@ -83,14 +93,7 @@ C2 = imfuse(fixed_low_pass,stack_recovered);%figure(4);imshow(C2) Post-registrat
 % fudgeFactor = 0.5;
 % BW_moving = edge(stack_moving,'sobel',moving_threshold * fudgeFactor);
 
-storm_x_col = 2;
-storm_y_col = 3;
 
-cluster_x_col = 1;
-cluster_y_col = 2;
-
-msd_x_col = 1;
-msd_y_col = 2;
 
 storm_x = storm(:,storm_x_col)./storm_pix_size;
 storm_y = storm(:,storm_y_col)./storm_pix_size;
@@ -101,6 +104,7 @@ msd_coef = sqrt(msd(:,4)).*1000;
 
 cluster_x = total_centers(:,cluster_x_col)./storm_pix_size;
 cluster_y = total_centers(:,cluster_y_col)./storm_pix_size;
+cluster_rad = total_centers(:,cluster_radius_col)./storm_pix_size;
 
 figure(1);
 imshow(5*stack_fixed);hold on;scatter(msd_y,msd_x,5,'filled','r')
@@ -294,14 +298,13 @@ end
 
 for i = 1:length(cluster_x_reg)
         
-        cluster_im(cluster_y_coord(i),cluster_x_coord(i)) = 1;
-        cluster_im_nor(cluster_y_coord_nor(i),cluster_x_coord_nor(i)) = 1;
+        cluster_im(cluster_y_coord(i),cluster_x_coord(i)) = i;
+        cluster_im_nor(cluster_y_coord_nor(i),cluster_x_coord_nor(i)) = i;
         
 end
 
-cluster_im = bwlabel(cluster_im,4);
         
-diffusion_im = diffusion_im;
+diffusion_im = diffusion_im./msd_im;
 diffusion_im(isnan(diffusion_im)) = 0;
 
 diffusion_line = diffusion_im(:);
@@ -465,24 +468,30 @@ clusterDiffusion(1,1) = mean(diffCoefs_in_notClusters);
 clusterDiffusion(2,1) = 1;
 
 
-for i = 2:max(cluster_im(:)+1)
+for i = 1:max(cluster_im(:))
+    if sum(cluster_im(:) == i) == 0;
+        continue
+    end
+    
     clusterID = zeros(size(cluster_im));
     center_y = cluster_y_coord(i);
     center_x = cluster_x_coord(i);
+    
+    cluster_size = int32(cluster_rad(i));
     
     center_x_array = center_x-floor(cluster_size/2):center_x+floor(cluster_size/2);
     center_y_array = center_y-floor(cluster_size/2):center_y+floor(cluster_size/2);
     center_x_array(center_x_array<1) = 1;center_y_array(center_y_array<1) = 1;center_x_array(center_x_array>X) = X;center_y_array(center_y_array>Y) = Y;
     
-    for j = 1:cluster_size
-        for k = 1:cluster_size
-            clusterID(center_y_array(j),center_x_array(k)) = i;
+    for j = 1:max([cluster_size,1])
+        for k = 1:max([cluster_size,1])
+            clusterID(center_y_array(j),center_x_array(k)) = 1;
         end
     end
             
     
-    clusterDiffusion(1,i) = sum(sum(clusterID.*diffusion_im));
-    clusterDiffusion(2,i) = sum(sum(clusterID.*msd_im));
+    clusterDiffusion(1,i+1) = sum(sum(clusterID.*diffusion_im));
+    clusterDiffusion(2,i+1) = sum(sum(clusterID.*msd_im));
     
 end
 
