@@ -1,4 +1,6 @@
-Instructions for "registerToSTORM.m" (written for MATLAB 2015, should work for all versions)
+Instructions for "registerToEpi.m" (written for MATLAB 2015, should work for all versions)
+
+This version does not require a STORM dataset, i.e. no STORM to PALM correlation, just speckle extraction
 
 Line 4 : sample = 'C7' - Amine has his images and folders named uniformly like:
  "/Users/reyer/Documents/MATLAB/SOURCE_CODES/sample_images_matt/Matt_Microscope/2021_March2nd_SC35_M3/',sample,'/',sample,'_M3_F6_488.tif"
@@ -34,9 +36,7 @@ Line 13 : epi_path = Change this to the filepath to the epi image of the STORM s
 					
 					This is the image from which the speckles will be extracted	
 
-Line 16: storm_file - This is the filepath to the STORM spot coordinates, in the form of a .csv. You can change the entire variable after the = to:
-					
-					storm_file = 'example/path/to/STORM_coordinates.csv'; 		
+		
 					
 Line 17: msd_file - This is the filepath to the sptPALM spot coordinates and diffusion coefficients, in the form of a .txt or .dat. 
 You can change the entire variable after the = to:

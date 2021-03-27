@@ -13,10 +13,10 @@ gfp_post_path=strcat(['/Users/reyer/Documents/MATLAB/SOURCE_CODES/sample_images_
 epi_path=strcat(['/Users/reyer/Documents/MATLAB/SOURCE_CODES/sample_images_matt/Matt_Microscope/2021_March2nd_SC35_M3/',sample,'/',sample,'_STORM.png']);
 
 
-storm_file = strcat(['/Users/reyer/Documents/MATLAB/SOURCE_CODES/sample_images_matt/Matt_Microscope/2021_March2nd_SC35_M3/',sample,'/',sample,'_STORM.csv']);
+
 msd_file = (['/Users/reyer/Documents/MATLAB/SOURCE_CODES/sample_images_matt/Matt_Microscope/onestep_MSD_list_min_3.dat']);
 
-storm = csvread(storm_file,1,0);
+
 msd = csvread(msd_file);
 
 storm_pix_size = 130; %Microns
@@ -82,14 +82,14 @@ C2 = imfuse(fixed_low_pass,stack_recovered);%figure(4);imshow(C2) Post-registrat
 % fudgeFactor = 0.5;
 % BW_moving = edge(stack_moving,'sobel',moving_threshold * fudgeFactor);
 
-storm_x_col = 2;
-storm_y_col = 3;
+
+
 
 msd_x_col = 1;
 msd_y_col = 2;
 
-storm_x = storm(:,storm_x_col)./storm_pix_size;
-storm_y = storm(:,storm_y_col)./storm_pix_size;
+
+
 
 msd_x = msd(:,msd_x_col)./msd_pix_size;
 msd_y = msd(:,msd_y_col)./msd_pix_size;
@@ -137,107 +137,7 @@ if saveFigures == 1
     savefig(gcf,file1_fig)
 end
 
-figure(2);
-imshow(5*stack_fixed);hold on;scatter(storm_x,storm_y,1,'filled','r');hold on;scatter(msd_y,msd_x,5,'filled','g');
-title('Spots Overlap, Original')
-legend('STORM','PALM')
-xlabel('Cell X Axis')
-ylabel('Cell Y Axis')
-if repositionFigures == 1
-    set(gcf,'position',[116,1106,676,597])
-elseif repositionFigures == 2
-    set(gcf,'position',[393,207,676,597])
-end
 
-if saveFigures == 1
-    set(gcf,'PaperPositionMode','auto')
-    file1 = strcat([saveFile,'/spots_overlap']);
-    print(file1,'-painters','-depsc','-r0')
-    set(gcf,'PaperPositionMode','auto')
-    print(file1,'-dpng','-r0')
-    file1_fig = strcat([saveFile,'/spots_overlap.fig']);
-    savefig(gcf,file1_fig)
-end
-
-[storm_x_reg,storm_y_reg] = transformPointsForward(tform,storm_x,storm_y);
-
-figure(3)
-imshow(5*stack_fixed);hold on;scatter(storm_x_reg,storm_y_reg,1,'filled','r');hold on;scatter(msd_y,msd_x,5,'filled','g');
-title('Spots Overlap, Registered')
-legend('STORM','PALM')
-xlabel('Cell X Axis')
-ylabel('Cell Y Axis')
-if repositionFigures == 1
-    set(gcf,'position',[796,1106,676,597])
-elseif repositionFigures == 2
-    set(gcf,'position',[765,208,676,597])
-end
-if saveFigures == 1
-    set(gcf,'PaperPositionMode','auto')
-    file1 = strcat([saveFile,'/spots_overlap_register']);
-    print(file1,'-painters','-depsc','-r0')
-    set(gcf,'PaperPositionMode','auto')
-    print(file1,'-dpng','-r0')
-    file1_fig = strcat([saveFile,'/spots_overlap_register.fig']);
-    savefig(gcf,file1_fig)
-end
-
-figure(4);scatter(storm_x,storm_y,1,'filled','r');hold on;scatter(msd_y,msd_x,5,'filled','g');
-title('Spots Overlap, Original')
-legend('STORM','PALM')
-xlabel('Cell X Axis')
-ylabel('Cell Y Axis')
-if repositionFigures == 1
-    set(gcf,'position',[367,904,556,421])
-elseif repositionFigures == 2
-    set(gcf,'position',[1,1,556,421])
-end
-if saveFigures == 1
-    set(gcf,'PaperPositionMode','auto')
-    file1 = strcat([saveFile,'/spots_overlap_scatter']);
-    print(file1,'-painters','-depsc','-r0')
-    set(gcf,'PaperPositionMode','auto')
-    print(file1,'-dpng','-r0')
-    file1_fig = strcat([saveFile,'/spots_overlap_scatter.fig']);
-    savefig(gcf,file1_fig)
-end
-
-figure(5);scatter(storm_x_reg,storm_y_reg,1,'filled','r');hold on;scatter(msd_y,msd_x,5,'filled','g');
-title('Spots Overlap, Original')
-legend('STORM','PALM')
-xlabel('Cell X Axis')
-ylabel('Cell Y Axis')
-if repositionFigures == 1
-    set(gcf,'position',[924,904,556,421])
-elseif repositionFigures == 2
-    set(gcf,'position',[558,1,556,421])
-end
-if saveFigures == 1
-    set(gcf,'PaperPositionMode','auto')
-    file1 = strcat([saveFile,'/spots_overlap_scatter']);
-    print(file1,'-painters','-depsc','-r0')
-    set(gcf,'PaperPositionMode','auto')
-    print(file1,'-dpng','-r0')
-    file1_fig = strcat([saveFile,'/spots_overlap_scatter.fig']);
-    savefig(gcf,file1_fig)
-end
-
-
-storm_x_coord = int32(storm_x_reg);
-storm_y_coord = int32(storm_y_reg);
-
-storm_x_coord_nor = int32(storm_x);
-storm_y_coord_nor = int32(storm_y);
-
-storm_x_coord(storm_x_coord<1) = 1;
-storm_y_coord(storm_y_coord<1) = 1;
-storm_x_coord(storm_x_coord>=X) = X;
-storm_y_coord(storm_y_coord>=Y) = Y;
-
-storm_x_coord_nor(storm_x_coord_nor<1) = 1;
-storm_y_coord_nor(storm_y_coord_nor<1) = 1;
-storm_x_coord_nor(storm_x_coord_nor>=X) = X;
-storm_y_coord_nor(storm_y_coord_nor>=Y) = Y;
 
 msd_x_coord = int32(msd_x);
 msd_y_coord = int32(msd_y);
@@ -249,15 +149,7 @@ msd_y_coord(msd_y_coord>=Y) = Y;
 
 msd_im = zeros(size(stack_fixed));
 diffusion_im = zeros(size(stack_fixed));
-storm_im = zeros(size(stack_fixed));
-storm_im_nor = zeros(size(stack_fixed));
 
-for i = 1:length(storm_x_reg)
-        
-        storm_im(storm_y_coord(i),storm_x_coord(i)) = storm_im(storm_y_coord(i),storm_x_coord(i)) + 1;
-        storm_im_nor(storm_y_coord_nor(i),storm_x_coord_nor(i)) = storm_im_nor(storm_y_coord_nor(i),storm_x_coord_nor(i)) + 1;
-        
-end
 
 for i = 1:length(msd)
         
@@ -265,102 +157,12 @@ for i = 1:length(msd)
         diffusion_im(msd_x_coord(i),msd_y_coord(i)) = diffusion_im(msd_x_coord(i),msd_y_coord(i)) + msd_coef(i);
 end
         
-diffusion_im = diffusion_im;
+
 diffusion_im(isnan(diffusion_im)) = 0;
 
 diffusion_line = diffusion_im(:);
-storm_line = storm_im(:);
-
-pixels = 1:length(storm_line);
-[R,P] = corrcoef(diffusion_line,storm_line);
-
-figure(6)
-ylabels{1}='STORM Spots';
-ylabels{2}='Average Diffusion Coefficient';
-[ax,hlines(1),hlines(2)] = plotyy(pixels,storm_line,pixels,diffusion_line);
-cfig = get(gcf,'color');
-pos = [0.1  0.1  0.7  0.8];
-offset = pos(3)/5.5;
-hlines(1).LineWidth = 2;
-hlines(2).LineWidth = 1;
-hlines(1).Color = 'b';
-hlines(2).Color = 'r';
-set(get(ax(1),'ylabel'),'string',ylabels{1})
-set(get(ax(2),'ylabel'),'string',ylabels{2})
-set(ax,{'ycolor'},{'b';'r'})
-
-title(strcat([ ' Correlation Coefficient = ', num2str(R(1,2), '%.3f'),', P-value = ', num2str(P(1,2), '%.3E')]),'FontSize',26)
-xlabel('Pixel')
-if repositionFigures == 1
-    set(gcf,'position',[-1919,342,1920,878])
-elseif repositionFigures == 2
-    set(gcf,'position',[-479,1074,1901,774])
-end
-if saveFigures == 1
-    set(gcf,'PaperPositionMode','auto')
-    file1 = strcat([saveFile,'/spots_v_diff']);
-    print(file1,'-painters','-depsc','-r0')
-    set(gcf,'PaperPositionMode','auto')
-    print(file1,'-dpng','-r0')
-    file1_fig = strcat([saveFile,'/spots_v_diff.fig']);
-    savefig(gcf,file1_fig)
-end
-
-storm_line_filtered = storm_line;
-storm_line_filtered(storm_line_filtered>500) = 500;
-[R,P] = corrcoef(storm_line_filtered,diffusion_line);
-
-figure(7)
-ylabels{1}='Filtered STORM Spots';
-ylabels{2}='Average Diffusion Coefficient';
-[ax,hlines(1),hlines(2)] = plotyy(pixels,storm_line_filtered,pixels,diffusion_line);
-cfig = get(gcf,'color');
-pos = [0.1  0.1  0.7  0.8];
-offset = pos(3)/5.5;
-hlines(1).LineWidth = 2;
-hlines(2).LineWidth = 1;
-hlines(1).Color = 'b';
-hlines(2).Color = 'r';
-set(get(ax(1),'ylabel'),'string',ylabels{1})
-set(get(ax(2),'ylabel'),'string',ylabels{2})
-set(ax,{'ycolor'},{'b';'r'})
-
-title(strcat([ 'Filtered, Correlation Coefficient = ', num2str(R(1,2), '%.3f'),', P-value = ', num2str(P(1,2), '%.3E')]),'FontSize',26)
-xlabel('Pixel')
-if repositionFigures == 1
-    set(gcf,'position',[-1919,523,1920,878])
-elseif repositionFigures == 2
-    set(gcf,'position',[-479,906,1901,774])
-end
-if saveFigures == 1
-    set(gcf,'PaperPositionMode','auto')
-    file1 = strcat([saveFile,'/spots_v_diff_filtered']);
-    print(file1,'-painters','-depsc','-r0')
-    set(gcf,'PaperPositionMode','auto')
-    print(file1,'-dpng','-r0')
-    file1_fig = strcat([saveFile,'/spots_v_diff_filtered.fig']);
-    savefig(gcf,file1_fig)
-end
 
 
-figure(8);image(storm_im,'CDataMapping','scaled');colorbar;caxis([0 250])
-title('STORM spots, Registered')
-xlabel('Cell X Axis')
-ylabel('Cell Y Axis')
-if repositionFigures == 1
-    set(gcf,'position',[-1983,331,560,420])
-elseif repositionFigures == 2
-    set(gcf,'position',[-479,1229,560,420])
-end
-if saveFigures == 1
-    set(gcf,'PaperPositionMode','auto')
-    file1 = strcat([saveFile,'/storm_spots_register']);
-    print(file1,'-painters','-depsc','-r0')
-    set(gcf,'PaperPositionMode','auto')
-    print(file1,'-dpng','-r0')
-    file1_fig = strcat([saveFile,'/storm_spots_register.fig']);
-    savefig(gcf,file1_fig)
-end
 
 figure(9);image(msd_im,'CDataMapping','scaled');colorbar;caxis([0 6])
 title('PALM spots, count')
@@ -379,24 +181,7 @@ if saveFigures == 1
     savefig(gcf,file1_fig)
 end
 
-figure(10);image(storm_im_nor,'CDataMapping','scaled');colorbar;caxis([0 250])
-title('STORM spots, Original')
-xlabel('Cell X Axis')
-ylabel('Cell Y Axis')
-if repositionFigures == 1
-    set(gcf,'position',[-918,331,560,420])
-elseif repositionFigures == 2
-    set(gcf,'position',[539,1229,560,420])
-end
-if saveFigures == 1
-    set(gcf,'PaperPositionMode','auto')
-    file1 = strcat([saveFile,'/storm_spots_original']);
-    print(file1,'-painters','-depsc','-r0')
-    set(gcf,'PaperPositionMode','auto')
-    print(file1,'-dpng','-r0')
-    file1_fig = strcat([saveFile,'/storm_spots_original.fig']);
-    savefig(gcf,file1_fig)
-end
+
 
 figure(11);image(diffusion_im./msd_im,'CDataMapping','scaled');colorbar
 title('PALM spots, Diffusion Coefficients')
@@ -521,7 +306,7 @@ end
 % 
 
 % figure(1)
-% imshow(stack2)close a
+% imshow(stack2)
 % set(gcf, 'position', [387 393 386 319])
 % figure(2)
 % imshow(stack3)
