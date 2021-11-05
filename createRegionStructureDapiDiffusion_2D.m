@@ -18,49 +18,54 @@ field14 = 'Membrane_Area';
 field15 = 'Middle_Area';
 field16 = 'Cytoplasm_Area';
 
+dapi_check = 0;
+
 middle_section_cutoff = 100; %In nm, how big is the middle section to be considered 2D? 100 = 50 nm above and below 0
 
-
-d5 = bwlabel(d4,4);
-num_dapi = max(d5(:));
-
-for j = 1:num_dapi
-    temp_dapi_mask = d5==j;
-    dapi_ids = [];
-    dapi_ids = unique(temp_dapi_mask.*new_mask);
+if dapi_check = 1;
+    d5 = bwlabel(d4,4);
+    num_dapi = max(d5(:));
     
-    if sum(dapi_ids ~= 0) == 0
-        d4(d5 == j) = 0;
-    end
+    for j = 1:num_dapi
+        temp_dapi_mask = d5==j;
+        dapi_ids = [];
+        dapi_ids = unique(temp_dapi_mask.*new_mask);
         
-end
-
-for i = 1:max(new_mask(:))
-    strcat(['Working on Cell ' num2str(i)])
-    
-    if sum(new_mask(:)==i) == 0
-        continue
-    end
-   
-    cell_struct(i).Dapi_Boundaries = bwboundaries(d4==i);
-    cell_struct(i).Transformed_Dapi_Boundaries = cell_struct(i).Dapi_Boundaries;
-    
-    
-    if ~isempty(cell_struct(i).Dapi_Boundaries) 
-        
-        for di = 1:length(cell_struct(i).Dapi_Boundaries)
-            
-            cell_struct(i).Transformed_Dapi_Boundaries{di,1}(:,1) = cell_struct(i).Transformed_Dapi_Boundaries{di,1}(:,1) - cell_struct(i).Center(2);
-            cell_struct(i).Transformed_Dapi_Boundaries{di,1}(:,2) = cell_struct(i).Transformed_Dapi_Boundaries{di,1}(:,2) - cell_struct(i).Center(1);
-            dapi_row_border = cell_struct(i).Transformed_Dapi_Boundaries{di,1}(:,1);
-            dapi_col_border = cell_struct(i).Transformed_Dapi_Boundaries{di,1}(:,2);
-            cell_struct(i).Transformed_Dapi_Boundaries{di,1}(:,1) = (dapi_col_border*sin(cell_struct(i).Cell_Angle)+dapi_row_border*cos(cell_struct(i).Cell_Angle));
-            cell_struct(i).Transformed_Dapi_Boundaries{di,1}(:,2) = (dapi_col_border*cos(cell_struct(i).Cell_Angle)-dapi_row_border*sin(cell_struct(i).Cell_Angle));
-            
+        if sum(dapi_ids ~= 0) == 0
+            d4(d5 == j) = 0;
         end
+        
     end
     
     
+    
+    for i = 1:max(new_mask(:))
+        strcat(['Working on Cell ' num2str(i)])
+        
+        if sum(new_mask(:)==i) == 0
+            continue
+        end
+        
+        cell_struct(i).Dapi_Boundaries = bwboundaries(d4==i);
+        cell_struct(i).Transformed_Dapi_Boundaries = cell_struct(i).Dapi_Boundaries;
+        
+        
+        if ~isempty(cell_struct(i).Dapi_Boundaries)
+            
+            for di = 1:length(cell_struct(i).Dapi_Boundaries)
+                
+                cell_struct(i).Transformed_Dapi_Boundaries{di,1}(:,1) = cell_struct(i).Transformed_Dapi_Boundaries{di,1}(:,1) - cell_struct(i).Center(2);
+                cell_struct(i).Transformed_Dapi_Boundaries{di,1}(:,2) = cell_struct(i).Transformed_Dapi_Boundaries{di,1}(:,2) - cell_struct(i).Center(1);
+                dapi_row_border = cell_struct(i).Transformed_Dapi_Boundaries{di,1}(:,1);
+                dapi_col_border = cell_struct(i).Transformed_Dapi_Boundaries{di,1}(:,2);
+                cell_struct(i).Transformed_Dapi_Boundaries{di,1}(:,1) = (dapi_col_border*sin(cell_struct(i).Cell_Angle)+dapi_row_border*cos(cell_struct(i).Cell_Angle));
+                cell_struct(i).Transformed_Dapi_Boundaries{di,1}(:,2) = (dapi_col_border*cos(cell_struct(i).Cell_Angle)-dapi_row_border*sin(cell_struct(i).Cell_Angle));
+                
+            end
+        end
+        
+        
+    end
 end
 
 cell_region_struct_2d = struct(field1,[],field2, [], field3, [], field4, [],field5, [],field6, [],field7, [],field8, [],field9, [],field10, [],field11, [],field12, [],field13, [],field14, [],field15, [],field16, []);
@@ -125,24 +130,32 @@ for ri = 1:length(cell_struct)
     
     cell_region_struct_2d(rid).Middle_Area = 0;
     pole_middle_volume = 0;
-    dapi_x_shift = [];
-    for ji = 1:length(cell_struct(ri).Transformed_Dapi_Boundaries)
-        
-        for jid = 2:length(cell_struct(ri).Transformed_Dapi_Boundaries{ji,1})
-            dapi_x_shift = [dapi_x_shift cell_struct(ri).Transformed_Dapi_Boundaries{ji,1}(jid,2)];
+    
+    if dapi_check = 1;
+        dapi_x_shift = [];
+        for ji = 1:length(cell_struct(ri).Transformed_Dapi_Boundaries)
+            
+            for jid = 2:length(cell_struct(ri).Transformed_Dapi_Boundaries{ji,1})
+                dapi_x_shift = [dapi_x_shift cell_struct(ri).Transformed_Dapi_Boundaries{ji,1}(jid,2)];
+            end
         end
+        
+        dapi_x_shift = mean(dapi_x_shift);
+        middle_area = 0;
+        %dapi_x_shift = 0;
+        for ji = 1:length(cell_struct(ri).Transformed_Dapi_Boundaries)
+            cell_struct(ri).Transformed_Dapi_Boundaries{ji,1}(:,2) = cell_struct(ri).Transformed_Dapi_Boundaries{ji,1}(:,2) - dapi_x_shift;
+            middle_area = middle_area + polyarea(cell_struct(ri).Transformed_Dapi_Boundaries{ji,1}(:,1),cell_struct(ri).Transformed_Dapi_Boundaries{ji,1}(:,2));
+        end
+        
+        cell_region_struct_2d(rid).Middle_Area = middle_area;
+    else
+        cell_region_struct_2d(rid).Middle_Area = middle_definition*cell_struct(ri).Cell_Y_Axis*pi*(.5*percent_off_center*cell_struct(ri).Cell_X_Axis)^2;
+        
     end
     
-    dapi_x_shift = mean(dapi_x_shift);
-    middle_area = 0;
-    %dapi_x_shift = 0;
-    for ji = 1:length(cell_struct(ri).Transformed_Dapi_Boundaries)
-        cell_struct(ri).Transformed_Dapi_Boundaries{ji,1}(:,2) = cell_struct(ri).Transformed_Dapi_Boundaries{ji,1}(:,2) - dapi_x_shift;
-        middle_area = middle_area + polyarea(cell_struct(ri).Transformed_Dapi_Boundaries{ji,1}(:,1),cell_struct(ri).Transformed_Dapi_Boundaries{ji,1}(:,2));
-    end
     
     
-    cell_region_struct_2d(rid).Middle_Area = middle_area;
     
 
     if regular == 1
@@ -315,12 +328,21 @@ for ri = 1:length(cell_struct)
         
         cell_struct(ri).Spots(sri,5) = 0;
         
-        for rjd = 1:length(cell_struct(ri).Transformed_Dapi_Boundaries)
-            if inpolygon(spot_row,spot_col,cell_struct(ri).Transformed_Dapi_Boundaries{rjd,1}(:,2),cell_struct(ri).Transformed_Dapi_Boundaries{rjd,1}(:,1))% && inpolygon(spot_row,spot_col,new_membrane_boundaries(:,2),new_membrane_boundaries(:,1))
+        if dapi_check = 1
+            
+            for rjd = 1:length(cell_struct(ri).Transformed_Dapi_Boundaries)
+                if inpolygon(spot_row,spot_col,cell_struct(ri).Transformed_Dapi_Boundaries{rjd,1}(:,2),cell_struct(ri).Transformed_Dapi_Boundaries{rjd,1}(:,1))% && inpolygon(spot_row,spot_col,new_membrane_boundaries(:,2),new_membrane_boundaries(:,1))
+                    middle = middle + 1;
+                    cell_struct(ri).Spots(sri,5) = 4;
+                    middle_diffusion = [middle_diffusion spot_struct(cell_struct(ri).Spots(sri,1)).DiffusionCoefficient];
+                    middle_check = 1;
+                    continue
+                end
+            end
+        else
+            if abs(spot_struct(cell_struct(ri).Spots(sri,1)).Collapsed_2D_Coordinate(1)) < percent_off_center*.5*cell_struct(ri).Cell_X_Axis && abs(spot_struct(cell_struct(ri).Spots(sri,1)).Collapsed_2D_Coordinate(2)) < middle_definition*.5*cell_struct(ri).Cell_Y_Axis
                 middle = middle + 1;
-                cell_struct(ri).Spots(sri,5) = 4;
                 middle_diffusion = [middle_diffusion spot_struct(cell_struct(ri).Spots(sri,1)).DiffusionCoefficient];
-                middle_check = 1;
                 continue
             end
         end
